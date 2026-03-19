@@ -1,6 +1,6 @@
 package edu.unilibre.Venta_de_Boletos;
 
-import edu.unilibre.Venta_de_Boletos.gui.VentanaCrearEvento;
+import edu.unilibre.Venta_de_Boletos.gui.VentanaPrincipal;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -16,7 +16,7 @@ public class VentaDeBoletosApplication {
 				.run(args);
 
 		EventQueue.invokeLater(() -> {
-			VentanaCrearEvento ventana = context.getBean(VentanaCrearEvento.class);
+			VentanaPrincipal ventana = context.getBean(VentanaPrincipal.class);
 			ventana.setVisible(true);
 		});
 	}
