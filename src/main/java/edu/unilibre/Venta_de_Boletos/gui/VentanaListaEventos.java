@@ -6,6 +6,7 @@ import edu.unilibre.Venta_de_Boletos.servicios.EventoServicio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -25,6 +26,10 @@ public class VentanaListaEventos extends JFrame {
 
     public VentanaListaEventos() {
         initComponents();
+    }
+
+    @PostConstruct
+    public void init() {
         cargarEventos();
     }
 
@@ -105,6 +110,12 @@ public class VentanaListaEventos extends JFrame {
     }
 
     private void cargarEventos() {
+
+        if (eventoServicio == null) {
+            System.err.println("Error: eventoServicio es null en VentanaListaEventos");
+            return;
+        }
+
         modeloTabla.setRowCount(0);
 
         List<Evento> eventos;

@@ -15,6 +15,9 @@ public class VentanaPrincipal extends JFrame {
     @Autowired
     private VentanaListaEventos ventanaListaEventos;
 
+    @Autowired
+    private VentanaComprarBoletas ventanaComprarBoletas;
+
     public VentanaPrincipal() {
         initComponents();
     }
@@ -45,8 +48,13 @@ public class VentanaPrincipal extends JFrame {
         });
         add(btnVerEventos);
 
+        JButton btnComprarBoletas = new JButton("3. Comprar Boletas");
+        btnComprarBoletas.setBounds(100, 180, 200, 40);
+        btnComprarBoletas.addActionListener(e -> ventanaComprarBoletas.setVisible(true));
+        add(btnComprarBoletas);
+
         JButton btnSalir = new JButton("Salir");
-        btnSalir.setBounds(150, 200, 100, 30);
+        btnSalir.setBounds(150, 225, 100, 30);
         btnSalir.addActionListener(e -> System.exit(0));
         add(btnSalir);
     }
