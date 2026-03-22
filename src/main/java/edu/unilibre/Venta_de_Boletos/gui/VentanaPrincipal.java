@@ -21,6 +21,9 @@ public class VentanaPrincipal extends JFrame {
     @Autowired
     private VentanaReportarPago ventanaReportarPago;
 
+    @Autowired
+    private VentanaMisCompras ventanaMisCompras;
+
     public VentanaPrincipal() {
         initComponents();
     }
@@ -61,8 +64,13 @@ public class VentanaPrincipal extends JFrame {
         btnReportarPago.addActionListener(e -> ventanaReportarPago.setVisible(true));
         add(btnReportarPago);
 
+        JButton btnMisCompras = new JButton("5. Ver Mis Compras");
+        btnMisCompras.setBounds(100, 280, 200, 40);
+        btnMisCompras.addActionListener(e -> ventanaMisCompras.setVisible(true));
+        add(btnMisCompras);
+
         JButton btnSalir = new JButton("Salir");
-        btnSalir.setBounds(150, 280, 100, 30);
+        btnSalir.setBounds(150, 330, 100, 30);
         btnSalir.addActionListener(e -> System.exit(0));
         add(btnSalir);
     }
