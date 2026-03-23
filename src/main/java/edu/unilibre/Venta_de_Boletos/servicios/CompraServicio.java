@@ -28,7 +28,7 @@ public class CompraServicio {
     @Autowired
     private ZonaRepositorio zonaRepositorio;
 
-    // ============ MÉTODOS PARA HU03 ============
+    // ============ MÉTODOS PARA HU03 (ya existentes) ============
 
     /**
      * Reservar boletas para un evento
@@ -136,10 +136,72 @@ public class CompraServicio {
         }
     }
 
+    // ============ NUEVOS MÉTODOS PARA HU04 ============
+
+    /**
+     * Buscar reservas pendientes (RESERVADA) por identificación del comprador
+     */
+    public List<Compra> buscarReservasPendientes(String identificacion) {
+        List<Compra> compras = compraRepositorio.findByCompradorIdentificacionOrderByFechaReservaDesc(identificacion);
+        // Filtrar solo las que están en estado RESERVADA
+        return compras.stream()
+                .filter(c -> c.getEstado() == EstadoCompra.RESERVADA)
+                .toList();
+    }
+
+    /**
+     * Procesar el pago de una reserva
+     */
+    public Compra procesarPago(Long compraId, String numeroComprobante, double montoPagado) {
+        Compra compra = compraRepositorio.findById(compraId)
+                .orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
+
+        // Verificar estado
+        if (compra.getEstado() != EstadoCompra.RESERVADA) {
+            throw new RuntimeException("La reserva no está en estado RESERVADA");
+        }
+
+        // Verificar expiración
+        if (compra.estaExpirada()) {
+            throw new RuntimeException("La reserva ha expirado");
+        }
+
+        // Validar monto
+        double total = compra.calcularTotal();
+        if (montoPagado != total) {
+            throw new RuntimeException("El valor pagado (" + String.format("$%,.0f", montoPagado) +
+                    ") no coincide con el total de la reserva ($" + String.format("$%,.0f", total) + ")");
+        }
+
+        // Procesar pago
+        compra.pagar(montoPagado, numeroComprobante);
+        return compraRepositorio.save(compra);
+    }
+
+    /**
+     * Obtener el tiempo restante de una reserva formateado
+     */
+    public String obtenerTiempoRestante(Compra compra) {
+        if (compra.getEstado() != EstadoCompra.RESERVADA) {
+            return "N/A";
+        }
+        if (compra.estaExpirada()) {
+            return "EXPIRADA";
+        }
+        LocalDateTime ahora = LocalDateTime.now();
+        long horas = java.time.Duration.between(ahora, compra.getFechaExpiracion()).toHours();
+        long minutos = java.time.Duration.between(ahora, compra.getFechaExpiracion()).toMinutes() % 60;
+
+        if (horas <= 0 && minutos <= 0) {
+            return "EXPIRADA";
+        }
+        return String.format("%d horas, %d minutos", horas, minutos);
+    }
+
     // ============ MÉTODOS PARA FUTURAS HUS ============
 
     /**
-     * Buscar compras por identificación de comprador
+     * Buscar compras por identificación de comprador (todas)
      */
     public List<Compra> buscarComprasPorIdentificacion(String identificacion) {
         return compraRepositorio.findByCompradorIdentificacionOrderByFechaReservaDesc(identificacion);

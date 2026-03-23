@@ -18,13 +18,16 @@ public class VentanaPrincipal extends JFrame {
     @Autowired
     private VentanaComprarBoletas ventanaComprarBoletas;
 
+    @Autowired
+    private VentanaReportarPago ventanaReportarPago;
+
     public VentanaPrincipal() {
         initComponents();
     }
 
     private void initComponents() {
         setTitle("Sistema de Venta de Boletos");
-        setSize(400, 300);
+        setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
         setLocationRelativeTo(null);
@@ -53,8 +56,13 @@ public class VentanaPrincipal extends JFrame {
         btnComprarBoletas.addActionListener(e -> ventanaComprarBoletas.setVisible(true));
         add(btnComprarBoletas);
 
+        JButton btnReportarPago = new JButton("4. Reportar Pago");
+        btnReportarPago.setBounds(100, 230, 200, 40);
+        btnReportarPago.addActionListener(e -> ventanaReportarPago.setVisible(true));
+        add(btnReportarPago);
+
         JButton btnSalir = new JButton("Salir");
-        btnSalir.setBounds(150, 225, 100, 30);
+        btnSalir.setBounds(150, 280, 100, 30);
         btnSalir.addActionListener(e -> System.exit(0));
         add(btnSalir);
     }
