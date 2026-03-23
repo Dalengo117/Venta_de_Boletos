@@ -19,6 +19,9 @@ public class VentanaListaEventos extends JFrame {
     @Autowired
     private EventoServicio eventoServicio;
 
+    @Autowired
+    private VentanaComprarBoletas ventanaComprarBoletas;
+
     private JTable tablaEventos;
     private DefaultTableModel modeloTabla;
     private JButton btnActualizar, btnReservar, btnCerrar;
@@ -189,7 +192,7 @@ public class VentanaListaEventos extends JFrame {
         @Override
         public Object getCellEditorValue() {
             if (isPushed) {
-                // Aquí se maneja el clic en Reservar
+                // Obtener datos del evento seleccionado
                 Long eventoId = (Long) modeloTabla.getValueAt(row, 0);
                 String eventoNombre = (String) modeloTabla.getValueAt(row, 1);
 
@@ -199,10 +202,9 @@ public class VentanaListaEventos extends JFrame {
                         JOptionPane.YES_NO_OPTION);
 
                 if (opcion == JOptionPane.YES_OPTION) {
-                    JOptionPane.showMessageDialog(VentanaListaEventos.this,
-                            "Funcionalidad de reserva en construcción\n(HU03 - Comprar boletas)",
-                            "Próximamente",
-                            JOptionPane.INFORMATION_MESSAGE);
+                    // Abrir la ventana de compra y pasar el ID del evento
+                    ventanaComprarBoletas.setEventoSeleccionado(eventoId);
+                    ventanaComprarBoletas.setVisible(true);
                 }
             }
             isPushed = false;
