@@ -4,10 +4,12 @@ import edu.unilibre.Venta_de_Boletos.gui.VentanaPrincipal;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.awt.*;
 
 @SpringBootApplication
+@EnableScheduling
 public class VentaDeBoletosApplication {
 
 	public static void main(String[] args) {
