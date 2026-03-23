@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @Transactional
@@ -87,5 +88,40 @@ public class EventoServicio {
                             .build();
                     return usuarioRepositorio.save(nuevoUsuario);
                 });
+    }
+
+    /**
+     * Obtiene todos los eventos ordenados por fecha (más próximos primero)
+     */
+    public List<Evento> obtenerTodosLosEventos() {
+        return eventoRepositorio.findAllByOrderByFechaAsc();
+    }
+
+    /**
+     * Obtiene eventos futuros (desde hoy en adelante)
+     */
+    public List<Evento> obtenerEventosFuturos() {
+        return eventoRepositorio.findByFechaGreaterThanEqualOrderByFechaAsc(LocalDate.now());
+    }
+
+    /**
+     * Obtiene la disponibilidad de un evento formateada para mostrar
+     */
+    public String obtenerDisponibilidadPorZona(Evento evento, TipoZona tipoZona) {
+        return evento.getZonas().stream()
+                .filter(z -> z.getTipoZona().equals(tipoZona))
+                .findFirst()
+                .map(z -> z.getBoletasDisponibles() > 0
+                        ? String.valueOf(z.getBoletasDisponibles())
+                        : "AGOTADO")
+                .orElse("N/D");
+    }
+
+    /**
+     * Verifica si un evento tiene boletas disponibles en alguna zona
+     */
+    public boolean tieneBoletasDisponibles(Evento evento) {
+        return evento.getZonas().stream()
+                .anyMatch(z -> z.getBoletasDisponibles() > 0);
     }
 }
