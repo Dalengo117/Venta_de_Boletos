@@ -23,6 +23,6 @@ public class Usuario {
     @OneToMany(mappedBy = "organizador")
     private List<Evento> eventosCreados;
 
-    @OneToMany(mappedBy = "comprador")
+    @OneToMany(mappedBy = "comprador", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Compra> compras;
 }
