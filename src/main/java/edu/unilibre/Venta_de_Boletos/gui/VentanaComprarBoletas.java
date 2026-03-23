@@ -27,10 +27,12 @@ public class VentanaComprarBoletas extends JFrame {
     private JSpinner spCantidadA, spCantidadB, spCantidadC;
     private JComboBox<MetodoPago> cbMetodoPago;
     private JLabel lblTotal, lblInfoEvento;
+    private JLabel lblTotalBoletas;
     private JButton btnReservar, btnLimpiar;
     private JPanel panelZonas;
 
     private Evento eventoSeleccionado;
+    private static final int MAX_BOLETAS_TOTAL = 10;
 
     public VentanaComprarBoletas() {
         initComponents();
@@ -94,23 +96,31 @@ public class VentanaComprarBoletas extends JFrame {
         panelZonas = new JPanel();
         panelZonas.setLayout(new GridLayout(3, 2, 10, 5));
         panelZonas.setBounds(labelX, y, 550, 100);
-        panelZonas.setBorder(BorderFactory.createTitledBorder("Cantidades (máx 10 por zona)"));
+        panelZonas.setBorder(BorderFactory.createTitledBorder("Cantidades (máx 10)"));
         add(panelZonas);
 
         // Spinners para cada zona
         panelZonas.add(new JLabel("Zona A ($200,000):"));
-        spCantidadA = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
+        spCantidadA = new JSpinner(new SpinnerNumberModel(0, 0, MAX_BOLETAS_TOTAL, 1));
         panelZonas.add(spCantidadA);
 
         panelZonas.add(new JLabel("Zona B ($100,000):"));
-        spCantidadB = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
+        spCantidadB = new JSpinner(new SpinnerNumberModel(0, 0, MAX_BOLETAS_TOTAL, 1));
         panelZonas.add(spCantidadB);
 
         panelZonas.add(new JLabel("Zona C ($50,000):"));
-        spCantidadC = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
+        spCantidadC = new JSpinner(new SpinnerNumberModel(0, 0, MAX_BOLETAS_TOTAL, 1));
         panelZonas.add(spCantidadC);
 
         y += 115;
+
+        agregarLabel("Total boletas:", labelX, y, 100, height);
+        lblTotalBoletas = new JLabel("0 / " + MAX_BOLETAS_TOTAL);
+        lblTotalBoletas.setFont(new Font("Arial", Font.BOLD, 12));
+        lblTotalBoletas.setForeground(new Color(0, 100, 0));
+        lblTotalBoletas.setBounds(fieldX, y, 150, height);
+        add(lblTotalBoletas);
+        y += 35;
 
         // Método de pago
         agregarLabel("Método de pago:", labelX, y, 120, height);
@@ -140,15 +150,60 @@ public class VentanaComprarBoletas extends JFrame {
         add(btnLimpiar);
 
         // Agregar listener para actualizar total
-        spCantidadA.addChangeListener(e -> actualizarTotal());
-        spCantidadB.addChangeListener(e -> actualizarTotal());
-        spCantidadC.addChangeListener(e -> actualizarTotal());
+        spCantidadA.addChangeListener(e -> {
+            validarLimiteTotal();
+            actualizarTotal();
+        });
+        spCantidadB.addChangeListener(e -> {
+            validarLimiteTotal();
+            actualizarTotal();
+        });
+        spCantidadC.addChangeListener(e -> {
+            validarLimiteTotal();
+            actualizarTotal();
+        });
     }
 
     private void agregarLabel(String texto, int x, int y, int ancho, int alto) {
         JLabel label = new JLabel(texto);
         label.setBounds(x, y, ancho, alto);
         add(label);
+    }
+
+    private void validarLimiteTotal() {
+        int cantA = (int) spCantidadA.getValue();
+        int cantB = (int) spCantidadB.getValue();
+        int cantC = (int) spCantidadC.getValue();
+        int total = cantA + cantB + cantC;
+
+        if (total > MAX_BOLETAS_TOTAL) {
+            // Mostrar mensaje de error y ajustar el último spinner que se modificó
+            JOptionPane.showMessageDialog(this,
+                    "No puede comprar más de " + MAX_BOLETAS_TOTAL + " boletas en total.\n" +
+                            "Total actual: " + total + " boletas.",
+                    "Límite excedido",
+                    JOptionPane.WARNING_MESSAGE);
+
+            // Reducir el valor del último spinner que causó el exceso
+            // Esta es una forma simple de corregir
+            if (cantA > 0 && (cantA + cantB + cantC - 1) > MAX_BOLETAS_TOTAL) {
+                spCantidadA.setValue(cantA - 1);
+            } else if (cantB > 0 && (cantA + cantB + cantC - 1) > MAX_BOLETAS_TOTAL) {
+                spCantidadB.setValue(cantB - 1);
+            } else if (cantC > 0 && (cantA + cantB + cantC - 1) > MAX_BOLETAS_TOTAL) {
+                spCantidadC.setValue(cantC - 1);
+            }
+        }
+
+        // Actualizar label de total de boletas
+        int totalActual = (int) spCantidadA.getValue() + (int) spCantidadB.getValue() + (int) spCantidadC.getValue();
+        lblTotalBoletas.setText(totalActual + " / " + MAX_BOLETAS_TOTAL);
+
+        if (totalActual == MAX_BOLETAS_TOTAL) {
+            lblTotalBoletas.setForeground(Color.RED);
+        } else {
+            lblTotalBoletas.setForeground(new Color(0, 100, 0));
+        }
     }
 
     private void cargarEventos() {
@@ -275,6 +330,16 @@ public class VentanaComprarBoletas extends JFrame {
                 return;
             }
 
+            int totalBoletas = cantA + cantB + cantC;
+            if (totalBoletas > MAX_BOLETAS_TOTAL) {
+                JOptionPane.showMessageDialog(this,
+                        "No puede comprar más de " + MAX_BOLETAS_TOTAL + " boletas en total.\n" +
+                                "Ha seleccionado " + totalBoletas + " boletas.",
+                        "Límite excedido",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             // Método de pago
             MetodoPago metodoPago = (MetodoPago) cbMetodoPago.getSelectedItem();
 
@@ -330,6 +395,21 @@ public class VentanaComprarBoletas extends JFrame {
         @Override
         public String toString() {
             return displayText;
+        }
+    }
+
+    /**
+     * Establece el evento seleccionado para reservar
+     * @param eventoId ID del evento a reservar
+     */
+    public void setEventoSeleccionado(Long eventoId) {
+        // Buscar el evento en el combo box
+        for (int i = 0; i < cbEventos.getItemCount(); i++) {
+            EventoComboItem item = cbEventos.getItemAt(i);
+            if (item != null && item.getEvento() != null && item.getEvento().getId().equals(eventoId)) {
+                cbEventos.setSelectedIndex(i);
+                break;
+            }
         }
     }
 }

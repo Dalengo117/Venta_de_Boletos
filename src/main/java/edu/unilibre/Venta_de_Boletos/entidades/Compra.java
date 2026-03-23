@@ -40,7 +40,7 @@ public class Compra {
     @JoinColumn(name = "evento_id")
     private Evento evento;
 
-    @OneToMany(mappedBy = "compra", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "compra", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Builder.Default
     private List<ItemCompra> items = new ArrayList<>();
 

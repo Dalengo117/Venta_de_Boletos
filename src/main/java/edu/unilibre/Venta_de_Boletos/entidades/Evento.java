@@ -31,7 +31,7 @@ public class Evento {
 
     private int totalBoletas;
 
-    @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Builder.Default
     private List<Zona> zonas = new ArrayList<>();
 

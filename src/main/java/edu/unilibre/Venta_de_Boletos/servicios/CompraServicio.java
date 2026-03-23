@@ -223,4 +223,33 @@ public class CompraServicio {
                 LocalDateTime.now()
         );
     }
+
+    // ============ NUEVO MÉTODO PARA HU06 ============
+
+    /**
+     * Cancelar manualmente una reserva (por expiración o por administrador)
+     */
+    public void cancelarReserva(Long compraId) {
+        Compra compra = compraRepositorio.findById(compraId)
+                .orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
+
+        if (compra.getEstado() != EstadoCompra.RESERVADA) {
+            throw new RuntimeException("Solo se pueden cancelar reservas en estado RESERVADA");
+        }
+
+        // Cambiar estado
+        compra.setEstado(EstadoCompra.CANCELADA);
+        compraRepositorio.save(compra);
+
+        // Liberar boletas
+        for (ItemCompra item : compra.getItems()) {
+            Zona zona = compra.getEvento().getZonas().stream()
+                    .filter(z -> z.getTipoZona().equals(item.getTipoZona()))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Zona no encontrada"));
+
+            zona.liberar(item.getCantidad());
+            zonaRepositorio.save(zona);
+        }
+    }
 }
